@@ -1,0 +1,4 @@
+rootProject.name = 'Hasher'
+include 'gui'
+include 'api'
+
