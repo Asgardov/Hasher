@@ -9,8 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class Main extends Application {
     @FXML
     private ComboBox<String> typeOfData;
@@ -33,7 +31,8 @@ public class Main extends Application {
     @FXML
     private Button copyAllButton;
 
-    ArrayList<String> types = new ArrayList<>();
+    private String[] typesForEncoding = {"eMails", "Phones"};
+
 
 
     @Override
@@ -50,6 +49,10 @@ public class Main extends Application {
 
 
     }
+    @FXML
+    public void initialize() {
+        typeOfData.setItems(FXCollections.observableArrayList(typesForEncoding));
+    }
 
     @FXML
     private void encodeData() {
@@ -57,6 +60,7 @@ public class Main extends Application {
         if (dataToEncodeText.isEmpty()) {
             System.out.println("empty");
         }
+        System.out.println(typeOfData.getSelectionModel().getSelectedItem());
 
 
 
