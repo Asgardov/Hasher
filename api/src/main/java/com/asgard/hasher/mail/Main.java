@@ -28,16 +28,5 @@ public class Main {
             writer.write(encodedMail + System.getProperty("line.separator"));
         }
         writer.close();
-
-
-
-        System.out.println("======================================");
-        System.out.println("================BROKEN================");
-
-        for (String eMail :
-                FormatChecker.brokenMailList) {
-            System.out.println(eMail);
-        }
-
     }
 }

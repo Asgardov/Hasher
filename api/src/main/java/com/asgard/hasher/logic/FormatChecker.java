@@ -13,19 +13,19 @@ public class FormatChecker {
 
     private static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    public static List<String> brokenMailList = new ArrayList<>();
 
-    private static boolean checkMailAddress(String mailaddress) {
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(mailaddress);
+    private static boolean checkMailAddress(String mailAddress) {
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(mailAddress);
         return matcher.find();
 
     }
-    public static List<String> validateMailsArray(List<String> arrToParse){
+
+    public static List<String> validateMailsArray(List<String> arrToParse) {
         ArrayList<String> validatedList = new ArrayList<>();
         for (String item :
                 arrToParse) {
             if (checkMailAddress(item))
-                validatedList.add(item);
+                validatedList.add(item.toLowerCase());
         }
         return validatedList;
     }
@@ -37,8 +37,7 @@ public class FormatChecker {
         while ((mailItem = bufferedReader.readLine()) != null) {
             if (checkMailAddress(mailItem)) {
                 mailList.add(mailItem);
-            } else
-                brokenMailList.add(mailItem);
+            }
         }
         bufferedReader.close();
         return mailList;

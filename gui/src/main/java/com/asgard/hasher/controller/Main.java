@@ -6,9 +6,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +48,6 @@ public class Main extends Application {
     private String[] typesForEncoding = {"eMails", "Phones"};
 
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader();
@@ -55,69 +60,72 @@ public class Main extends Application {
         primaryStage.show();
 
 
-
     }
+
     @FXML
     public void initialize() {
         typeOfData.setItems(FXCollections.observableArrayList(typesForEncoding));
+        typeOfData.getSelectionModel().selectFirst();
     }
 
     @FXML
     private void encodeData() {
         String dataToEncodeText = dataToEncode.getText();
         if (dataToEncodeText.isEmpty()) {
-            System.out.println("empty");
+            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+            errorAlert.setHeaderText("ERROR");
+            errorAlert.setContentText("Nothing to encode. \nFirst add some emails or phones to left text field");
+            errorAlert.showAndWait();
         }
-        System.out.println(typeOfData.getSelectionModel().getSelectedItem());
+
         List dataL = stringToArray(dataToEncodeText);
         List<String> readyToEncode = new ArrayList();
-        if(withValidation.isSelected() && typeOfData.getSelectionModel().getSelectedItem()!=null){
-            if(typeOfData.getSelectionModel().getSelectedItem().equals("eMails")) {
+
+        if (withValidation.isSelected()) {
+            if (typeOfData.getSelectionModel().getSelectedItem().equals("eMails")) {
                 readyToEncode = validateMailsArray(dataL);
             }
-            if(typeOfData.getSelectionModel().getSelectedItem().equals("Phones")) {
+            if (typeOfData.getSelectionModel().getSelectedItem().equals("Phones")) {
 //                TODO  Create validation params
-//                List readyToEncode = validateMailsArray(dataL);
-                System.out.println("coming Soon");
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setHeaderText("ERROR");
+                errorAlert.setContentText("THERE IS NOTHING YET");
+                errorAlert.showAndWait();
             }
+        } else
+            readyToEncode = dataL;
+
+        if (!readyToEncode.isEmpty()) {
+            md5TextArea.setText(resultPrep(encodeListToMd5(readyToEncode)));
+            sha256TextArea.setText(resultPrep(encodeListToSHA256(readyToEncode)));
+            copyAllButton.disableProperty().set(false);
+
         }
-        if (!readyToEncode.isEmpty()){
-            StringBuilder sBuilder = new StringBuilder();
-            for (String encItem :
-                    encodeListToMd5(readyToEncode)) {
-                sBuilder.append(encItem);
-                sBuilder.append("\n");
-            }
-            md5TextArea.setText(sBuilder.toString());
-            sBuilder = new StringBuilder();
-            for (String encItem :
-                    encodeListToSHA256(readyToEncode)) {
-                sBuilder.append(encItem);
-                sBuilder.append("\n");
-            }
-            sha256TextArea.setText(sBuilder.toString());
-        }
-
-
-
-    }
-
-
-    @FXML
-    private void checkValidation() {
-        System.out.println(withValidation.isSelected());
     }
 
     @FXML
     private void copyAll() {
-
-
+        StringSelection stringSelection = new StringSelection(getTextAreaFromSelectedTab().getText());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
     }
 
 
     private TextArea getTextAreaFromSelectedTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
-        return (TextArea) selectedTab.getContent();
+        AnchorPane selectedAnchorPane = (AnchorPane) selectedTab.getContent();
+        return (TextArea) selectedAnchorPane.getChildren().get(0);
+    }
+
+    private String resultPrep(List<String> encoded) {
+        StringBuilder result = new StringBuilder();
+        for (String encItem :
+                encoded) {
+            result.append(encItem);
+            result.append("\n");
+        }
+        return result.toString();
+
     }
 
 
