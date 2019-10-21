@@ -9,6 +9,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.asgard.hasher.logic.Encoder.encodeListToMd5;
+import static com.asgard.hasher.logic.Encoder.encodeListToSHA256;
+import static com.asgard.hasher.logic.FormatChecker.validateMailsArray;
+import static com.asgard.hasher.logic.Preparator.stringToArray;
+
 public class Main extends Application {
     @FXML
     private ComboBox<String> typeOfData;
@@ -61,6 +69,34 @@ public class Main extends Application {
             System.out.println("empty");
         }
         System.out.println(typeOfData.getSelectionModel().getSelectedItem());
+        List dataL = stringToArray(dataToEncodeText);
+        List<String> readyToEncode = new ArrayList();
+        if(withValidation.isSelected() && typeOfData.getSelectionModel().getSelectedItem()!=null){
+            if(typeOfData.getSelectionModel().getSelectedItem().equals("eMails")) {
+                readyToEncode = validateMailsArray(dataL);
+            }
+            if(typeOfData.getSelectionModel().getSelectedItem().equals("Phones")) {
+//                TODO  Create validation params
+//                List readyToEncode = validateMailsArray(dataL);
+                System.out.println("coming Soon");
+            }
+        }
+        if (!readyToEncode.isEmpty()){
+            StringBuilder sBuilder = new StringBuilder();
+            for (String encItem :
+                    encodeListToMd5(readyToEncode)) {
+                sBuilder.append(encItem);
+                sBuilder.append("\n");
+            }
+            md5TextArea.setText(sBuilder.toString());
+            sBuilder = new StringBuilder();
+            for (String encItem :
+                    encodeListToSHA256(readyToEncode)) {
+                sBuilder.append(encItem);
+                sBuilder.append("\n");
+            }
+            sha256TextArea.setText(sBuilder.toString());
+        }
 
 
 

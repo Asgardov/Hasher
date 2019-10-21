@@ -15,10 +15,19 @@ public class FormatChecker {
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static List<String> brokenMailList = new ArrayList<>();
 
-    private boolean checkMailAddress(String mailaddress) {
+    private static boolean checkMailAddress(String mailaddress) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(mailaddress);
         return matcher.find();
 
+    }
+    public static List<String> validateMailsArray(List<String> arrToParse){
+        ArrayList<String> validatedList = new ArrayList<>();
+        for (String item :
+                arrToParse) {
+            if (checkMailAddress(item))
+                validatedList.add(item);
+        }
+        return validatedList;
     }
 
     public List<String> parseFile(File file) throws IOException {
