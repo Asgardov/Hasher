@@ -6,9 +6,22 @@ import java.util.List;
 
 public class Preparator {
 
-    public static List stringToArray (String dataS){
+    private Preparator() {
+    }
+
+    public static List stringToArray(String dataS) {
         String[] splited = dataS.split("\\r?\\n");
-        List<String> dataL = new ArrayList<>(Arrays.asList(splited));
-        return dataL;
+        return new ArrayList<>(Arrays.asList(splited));
+    }
+
+    public static String resultPrep(List<String> encoded) {
+        StringBuilder result = new StringBuilder();
+        for (String encItem :
+                encoded) {
+            result.append(encItem);
+            result.append("\n");
+        }
+        return result.toString();
+
     }
 }

@@ -21,7 +21,7 @@ import java.util.List;
 import static com.asgard.hasher.logic.Encoder.encodeListToMd5;
 import static com.asgard.hasher.logic.Encoder.encodeListToSHA256;
 import static com.asgard.hasher.logic.FormatChecker.validateMailsArray;
-import static com.asgard.hasher.logic.Preparator.stringToArray;
+import static com.asgard.hasher.logic.Preparator.*;
 
 public class Main extends Application {
     @FXML
@@ -72,14 +72,11 @@ public class Main extends Application {
     private void encodeData() {
         String dataToEncodeText = dataToEncode.getText();
         if (dataToEncodeText.isEmpty()) {
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setHeaderText("ERROR");
-            errorAlert.setContentText("Nothing to encode. \nFirst add some emails or phones to left text field");
-            errorAlert.showAndWait();
+            new SimpleAlert("NOTHING TO ENCODE");
         }
 
         List dataL = stringToArray(dataToEncodeText);
-        List<String> readyToEncode = new ArrayList();
+        List<String> readyToEncode = new ArrayList<>();
 
         if (withValidation.isSelected()) {
             if (typeOfData.getSelectionModel().getSelectedItem().equals("eMails")) {
@@ -87,10 +84,7 @@ public class Main extends Application {
             }
             if (typeOfData.getSelectionModel().getSelectedItem().equals("Phones")) {
 //                TODO  Create validation params
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setHeaderText("ERROR");
-                errorAlert.setContentText("THERE IS NOTHING YET");
-                errorAlert.showAndWait();
+                new SimpleAlert("THERE IS NOTHING YET");
             }
         } else
             readyToEncode = dataL;
@@ -115,17 +109,6 @@ public class Main extends Application {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         AnchorPane selectedAnchorPane = (AnchorPane) selectedTab.getContent();
         return (TextArea) selectedAnchorPane.getChildren().get(0);
-    }
-
-    private String resultPrep(List<String> encoded) {
-        StringBuilder result = new StringBuilder();
-        for (String encItem :
-                encoded) {
-            result.append(encItem);
-            result.append("\n");
-        }
-        return result.toString();
-
     }
 
 

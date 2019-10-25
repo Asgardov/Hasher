@@ -1,9 +1,5 @@
 package com.asgard.hasher.logic;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,25 +18,17 @@ public class FormatChecker {
 
     public static List<String> validateMailsArray(List<String> arrToParse) {
         ArrayList<String> validatedList = new ArrayList<>();
+        ArrayList<String> trimmedList = new ArrayList<>();
         for (String item :
                 arrToParse) {
+            trimmedList.add(item.trim().toLowerCase());
+        }
+        for (String item :
+                trimmedList) {
             if (checkMailAddress(item))
-                validatedList.add(item.toLowerCase());
+                validatedList.add(item);
         }
         return validatedList;
-    }
-
-    public List<String> parseFile(File file) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-        ArrayList<String> mailList = new ArrayList<>();
-        String mailItem;
-        while ((mailItem = bufferedReader.readLine()) != null) {
-            if (checkMailAddress(mailItem)) {
-                mailList.add(mailItem);
-            }
-        }
-        bufferedReader.close();
-        return mailList;
     }
 
 
