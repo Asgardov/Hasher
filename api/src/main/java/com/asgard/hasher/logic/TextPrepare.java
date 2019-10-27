@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Preparator {
+public class TextPrepare {
 
-    private Preparator() {
+    private TextPrepare() {
     }
 
-    public static List stringToArray(String dataS) {
-        String[] splited = dataS.split("\\r?\\n");
-        return new ArrayList<>(Arrays.asList(splited));
+    public static List<String> stringToArray(String dataS) {
+        String[] arrayOfStrings = dataS.split("\\r?\\n");
+        return new ArrayList<>(Arrays.asList(arrayOfStrings));
     }
 
-    public static String resultPrep(List<String> encoded) {
+    public static String resultPrepForOutput(List<String> encoded) {
         StringBuilder result = new StringBuilder();
         for (String encItem :
                 encoded) {

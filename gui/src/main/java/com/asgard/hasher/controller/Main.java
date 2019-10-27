@@ -2,6 +2,7 @@ package com.asgard.hasher.controller;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +22,7 @@ import java.util.List;
 import static com.asgard.hasher.logic.Encoder.encodeListToMd5;
 import static com.asgard.hasher.logic.Encoder.encodeListToSHA256;
 import static com.asgard.hasher.logic.FormatChecker.validateMailsArray;
-import static com.asgard.hasher.logic.Preparator.*;
+import static com.asgard.hasher.logic.TextPrepare.*;
 
 public class Main extends Application {
     @FXML
@@ -44,6 +45,10 @@ public class Main extends Application {
     private Button encodeButton;
     @FXML
     private Button copyAllButton;
+    @FXML
+    private Button saveToCsvButton;
+    @FXML
+    private Button clearResultsButton;
 
     private String[] typesForEncoding = {"eMails", "Phones"};
 
@@ -54,6 +59,7 @@ public class Main extends Application {
         loader.setLocation(getClass().getResource("/views/main.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
+        primaryStage.setResizable(false);
 
         primaryStage.setTitle("Encoder");
         primaryStage.setScene(scene);
@@ -73,9 +79,10 @@ public class Main extends Application {
         String dataToEncodeText = dataToEncode.getText();
         if (dataToEncodeText.isEmpty()) {
             new SimpleAlert("NOTHING TO ENCODE");
+            return;
         }
 
-        List dataL = stringToArray(dataToEncodeText);
+        List<String> dataL = stringToArray(dataToEncodeText);
         List<String> readyToEncode = new ArrayList<>();
 
         if (withValidation.isSelected()) {
@@ -90,9 +97,12 @@ public class Main extends Application {
             readyToEncode = dataL;
 
         if (!readyToEncode.isEmpty()) {
-            md5TextArea.setText(resultPrep(encodeListToMd5(readyToEncode)));
-            sha256TextArea.setText(resultPrep(encodeListToSHA256(readyToEncode)));
+            md5TextArea.setText(resultPrepForOutput(encodeListToMd5(readyToEncode)));
+            sha256TextArea.setText(resultPrepForOutput(encodeListToSHA256(readyToEncode)));
             copyAllButton.disableProperty().set(false);
+            saveToCsvButton.disableProperty().set(false);
+            clearResultsButton.disableProperty().set(false);
+
 
         }
     }
@@ -102,6 +112,30 @@ public class Main extends Application {
         StringSelection stringSelection = new StringSelection(getTextAreaFromSelectedTab().getText());
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
+    }
+
+    @FXML
+    private void saveToCsv(){
+
+        if (!md5TextArea.getText().isEmpty() && !sha256TextArea.getText().isEmpty()){
+
+            md5TextArea.getText();
+            sha256TextArea.getText();
+        }
+
+    }
+
+    @FXML
+    private void clearResults(){
+        ObservableList<Tab> tabs = tabPane.getTabs();
+        for (Tab tab :
+                tabs) {
+            ((TextArea) ((AnchorPane) tab.getContent()).getChildren().get(0)).setText("");
+        }
+        copyAllButton.disableProperty().set(true);
+        saveToCsvButton.disableProperty().set(true);
+        clearResultsButton.disableProperty().set(true);
+
     }
 
 

@@ -7,6 +7,10 @@ import java.util.List;
 
 public class Encoder {
 
+    private Encoder(){
+
+    }
+
     public static List<String> encodeListToMd5(List<String> validMailList) {
         ArrayList<String> encodedMailList = new ArrayList<>();
         for (String mailItem :
