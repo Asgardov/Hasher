@@ -12,10 +12,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,12 +119,13 @@ public class Main extends Application {
     }
 
     @FXML
-    private void saveToCsv(){
+    private void saveToCsv() throws IOException {
 
         if (!md5TextArea.getText().isEmpty() && !sha256TextArea.getText().isEmpty()){
 
-            md5TextArea.getText();
-            sha256TextArea.getText();
+            List<String> md5Strings = stringToArray(md5TextArea.getText());
+            List<String> sha256Strings = stringToArray(sha256TextArea.getText());
+            FileWriter md5file = new FileWriter("md5.csv");
         }
 
     }
