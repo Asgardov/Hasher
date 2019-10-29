@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -18,6 +19,7 @@ import org.apache.commons.csv.CSVPrinter;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +28,8 @@ import java.util.List;
 import static com.asgard.hasher.logic.Encoder.encodeListToMd5;
 import static com.asgard.hasher.logic.Encoder.encodeListToSHA256;
 import static com.asgard.hasher.logic.FormatChecker.validateMailsArray;
-import static com.asgard.hasher.logic.TextPrepare.*;
+import static com.asgard.hasher.logic.TextPrepare.resultPrepForOutput;
+import static com.asgard.hasher.logic.TextPrepare.stringToArray;
 
 public class Main extends Application {
     @FXML
@@ -121,17 +124,19 @@ public class Main extends Application {
     @FXML
     private void saveToCsv() throws IOException {
 
-        if (!md5TextArea.getText().isEmpty() && !sha256TextArea.getText().isEmpty()){
+        if (!md5TextArea.getText().isEmpty() && !sha256TextArea.getText().isEmpty()) {
 
             List<String> md5Strings = stringToArray(md5TextArea.getText());
             List<String> sha256Strings = stringToArray(sha256TextArea.getText());
-            FileWriter md5file = new FileWriter("md5.csv");
+            FileWriter md5CsvFile = createCSVFile(md5Strings);
+            saveFile(null, md5CsvFile);
+
         }
 
     }
 
     @FXML
-    private void clearResults(){
+    private void clearResults() {
         ObservableList<Tab> tabs = tabPane.getTabs();
         for (Tab tab :
                 tabs) {
@@ -148,6 +153,35 @@ public class Main extends Application {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         AnchorPane selectedAnchorPane = (AnchorPane) selectedTab.getContent();
         return (TextArea) selectedAnchorPane.getChildren().get(0);
+    }
+
+    private FileWriter createCSVFile(List<String> list) {
+        FileWriter out = null;
+        CSVPrinter printer = null;
+        try {
+            out = new FileWriter("csv.txt");
+            printer = new CSVPrinter(out, CSVFormat.DEFAULT);
+            for (String record :
+                    list) {
+                printer.printRecord(record);
+                printer.println();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return out ;
+
+    }
+
+    private void saveFile(Stage primaryStage, FileWriter file) {
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.setTitle("Save to CSV");
+        //Set extension filter for text files
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.showSaveDialog(null);
     }
 
 
