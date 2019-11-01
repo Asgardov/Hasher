@@ -9,12 +9,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -28,6 +27,7 @@ import java.util.List;
 import static com.asgard.hasher.logic.Encoder.encodeListToMd5;
 import static com.asgard.hasher.logic.Encoder.encodeListToSHA256;
 import static com.asgard.hasher.logic.FormatChecker.validateMailsArray;
+import static com.asgard.hasher.logic.FormatChecker.validatePhonesArray;
 import static com.asgard.hasher.logic.TextPrepare.resultPrepForOutput;
 import static com.asgard.hasher.logic.TextPrepare.stringToArray;
 
@@ -56,6 +56,10 @@ public class Main extends Application {
     private Button saveToCsvButton;
     @FXML
     private Button clearResultsButton;
+    @FXML
+    private TextField md5ColName;
+    @FXML
+    private TextField sha256ColName;
 
     private String[] typesForEncoding = {"eMails", "Phones"};
 
@@ -67,7 +71,6 @@ public class Main extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root);
         primaryStage.setResizable(false);
-
         primaryStage.setTitle("Encoder");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -84,6 +87,7 @@ public class Main extends Application {
     @FXML
     private void encodeData() {
         String dataToEncodeText = dataToEncode.getText();
+        clearTabs();
         if (dataToEncodeText.isEmpty()) {
             new SimpleAlert("NOTHING TO ENCODE");
             return;
@@ -97,8 +101,7 @@ public class Main extends Application {
                 readyToEncode = validateMailsArray(dataL);
             }
             if (typeOfData.getSelectionModel().getSelectedItem().equals("Phones")) {
-//                TODO  Create validation params
-                new SimpleAlert("THERE IS NOTHING YET");
+                readyToEncode = validatePhonesArray(dataL);
             }
         } else
             readyToEncode = dataL;
@@ -109,7 +112,6 @@ public class Main extends Application {
             copyAllButton.disableProperty().set(false);
             saveToCsvButton.disableProperty().set(false);
             clearResultsButton.disableProperty().set(false);
-
 
         }
     }
@@ -122,14 +124,18 @@ public class Main extends Application {
     }
 
     @FXML
-    private void saveToCsv() throws IOException {
+    private void saveToCsv() {
+        String columnName = getTextFieldFromSelectedTab().getText().trim();
+        String textToSave = getTextAreaFromSelectedTab().getText();
+        String text;
 
-        if (!md5TextArea.getText().isEmpty() && !sha256TextArea.getText().isEmpty()) {
-
-            List<String> md5Strings = stringToArray(md5TextArea.getText());
-            List<String> sha256Strings = stringToArray(sha256TextArea.getText());
-            FileWriter md5CsvFile = createCSVFile(md5Strings);
-            saveFile(null, md5CsvFile);
+        if (!textToSave.isEmpty()) {
+            if (!columnName.isEmpty()){
+                text = columnName + "\n" + textToSave;
+            }else {
+                text = textToSave;
+            }
+            createCSVFile(text, selectWhereToSave());
 
         }
 
@@ -137,51 +143,52 @@ public class Main extends Application {
 
     @FXML
     private void clearResults() {
-        ObservableList<Tab> tabs = tabPane.getTabs();
-        for (Tab tab :
-                tabs) {
-            ((TextArea) ((AnchorPane) tab.getContent()).getChildren().get(0)).setText("");
-        }
+        clearTabs();
         copyAllButton.disableProperty().set(true);
         saveToCsvButton.disableProperty().set(true);
         clearResultsButton.disableProperty().set(true);
 
     }
 
+    private void clearTabs() {
+        ObservableList<Tab> tabs = tabPane.getTabs();
+        for (Tab tab :
+                tabs) {
+            ((TextArea) ((AnchorPane) tab.getContent()).getChildren().get(1)).setText("");
+        }
+    }
+
 
     private TextArea getTextAreaFromSelectedTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         AnchorPane selectedAnchorPane = (AnchorPane) selectedTab.getContent();
-        return (TextArea) selectedAnchorPane.getChildren().get(0);
+        return (TextArea) selectedAnchorPane.getChildren().get(1);
     }
 
-    private FileWriter createCSVFile(List<String> list) {
-        FileWriter out = null;
-        CSVPrinter printer = null;
-        try {
-            out = new FileWriter("csv.txt");
-            printer = new CSVPrinter(out, CSVFormat.DEFAULT);
-            for (String record :
-                    list) {
-                printer.printRecord(record);
-                printer.println();
-            }
+    private TextField getTextFieldFromSelectedTab(){
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        AnchorPane selectedAnchorPane = (AnchorPane) selectedTab.getContent();
+        return (TextField) selectedAnchorPane.getChildren().get(0);
+    }
+
+    private void createCSVFile(String text, File file) {
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(text);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return out ;
 
     }
 
-    private void saveFile(Stage primaryStage, FileWriter file) {
-        FileChooser fileChooser = new FileChooser();
-
-        fileChooser.setTitle("Save to CSV");
-        //Set extension filter for text files
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
-        fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.showSaveDialog(null);
+    private File selectWhereToSave() {
+        File userHome = new File(System.getProperty("user.home"));
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select where to save files");
+        chooser.setInitialDirectory(userHome);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        return chooser.showSaveDialog(null);
     }
 
 

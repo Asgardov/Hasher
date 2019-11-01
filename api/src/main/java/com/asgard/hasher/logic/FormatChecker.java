@@ -34,5 +34,14 @@ public class FormatChecker {
         return validatedList;
     }
 
+    public static List<String> validatePhonesArray(List<String> arrToParse){
+        ArrayList<String> validatedList = new ArrayList<>();
+        for (String item :
+                arrToParse) {
+            validatedList.add(item.replaceAll("[^\\d.]", ""));
+        }
+        return validatedList;
+    }
+
 
 }
