@@ -12,7 +12,6 @@ mainClassName = 'com.asgard.hasher.controller.Main'
 
 dependencies {
     compile project(':api')
-    compile 'org.apache.commons:commons-csv:1.7'
 }
 
 task fatJar(type: Jar) {
