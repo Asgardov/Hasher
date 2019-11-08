@@ -21,24 +21,21 @@ public class FormatChecker {
 
     public static List<String> validateMailsArray(List<String> arrToParse) {
         ArrayList<String> validatedList = new ArrayList<>();
-        ArrayList<String> trimmedList = new ArrayList<>();
         for (String item :
                 arrToParse) {
-            trimmedList.add(item.trim().toLowerCase());
-        }
-        for (String item :
-                trimmedList) {
-            if (checkMailAddress(item))
-                validatedList.add(item);
+            String trimmedItem = item.trim().toLowerCase();
+            if (trimmedItem.length() > 0 && checkMailAddress(trimmedItem))
+                validatedList.add(trimmedItem);
         }
         return validatedList;
     }
 
-    public static List<String> validatePhonesArray(List<String> arrToParse){
+    public static List<String> validatePhonesArray(List<String> arrToParse) {
         ArrayList<String> validatedList = new ArrayList<>();
         for (String item :
                 arrToParse) {
-            validatedList.add(item.replaceAll("[^\\d.]", ""));
+            if (item.trim().length() > 0)
+                validatedList.add(item.trim().replaceAll("[^\\d.]", ""));
         }
         return validatedList;
     }

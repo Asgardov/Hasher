@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
@@ -60,6 +61,10 @@ public class Main extends Application {
     private TextField md5ColName;
     @FXML
     private TextField sha256ColName;
+    @FXML
+    private Label inputLinesCount;
+    @FXML
+    private Label outputLinesCount;
 
     private String[] typesForEncoding = {"eMails", "Phones"};
 
@@ -82,6 +87,12 @@ public class Main extends Application {
     public void initialize() {
         typeOfData.setItems(FXCollections.observableArrayList(typesForEncoding));
         typeOfData.getSelectionModel().selectFirst();
+
+        dataToEncode.textProperty().addListener((observable, oldValue, newValue)
+                -> inputLinesCount.setText(String.valueOf(dataToEncode.getText().isEmpty() ? 0 : dataToEncode.getText().split("\\r?\\n").length)
+        ));
+        md5TextArea.textProperty().addListener((observable, oldValue, newValue)
+                -> outputLinesCount.setText(String.valueOf(md5TextArea.getText().isEmpty() ? 0 : md5TextArea.getText().split("\\r?\\n").length)));
     }
 
     @FXML
@@ -130,9 +141,9 @@ public class Main extends Application {
         String text;
 
         if (!textToSave.isEmpty()) {
-            if (!columnName.isEmpty()){
+            if (!columnName.isEmpty()) {
                 text = columnName + "\n" + textToSave;
-            }else {
+            } else {
                 text = textToSave;
             }
             createCSVFile(text, selectWhereToSave());
@@ -165,7 +176,7 @@ public class Main extends Application {
         return (TextArea) selectedAnchorPane.getChildren().get(1);
     }
 
-    private TextField getTextFieldFromSelectedTab(){
+    private TextField getTextFieldFromSelectedTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         AnchorPane selectedAnchorPane = (AnchorPane) selectedTab.getContent();
         return (TextField) selectedAnchorPane.getChildren().get(0);
